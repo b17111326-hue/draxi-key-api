@@ -23,43 +23,51 @@ export default async function handler(req, res) {
       });
     }
 
-    // Procura a Key na coluna "Key"
     const resultKey = await supabase
       .from("Key")
       .select("id")
       .eq("Key", key)
       .maybeSingle();
 
-    // Se encontrou na coluna Key
-    if (resultKey.data) {
-      return res.status(200).json({
-        valid: true,
-        message: "Key válida pela coluna Key"
+    if (resultKey.error) {
+      return res.status(500).json({
+        valid: false,
+        message: "Erro do Supabase",
+        detalhes: resultKey.error.message,
+        codigo: resultKey.error.code,
+        detalhes_extra: resultKey.error.details,
+        dica: resultKey.error.hint
       });
     }
 
-    // Procura também na coluna "teste"
+    if (resultKey.data) {
+      return res.status(200).json({
+        valid: true,
+        message: "Key válida"
+      });
+    }
+
     const resultTeste = await supabase
       .from("Key")
       .select("id")
       .eq("teste", key)
       .maybeSingle();
 
-    // Se encontrou na coluna teste
-    if (resultTeste.data) {
-      return res.status(200).json({
-        valid: true,
-        message: "Key válida pela coluna teste"
-      });
-    }
-
-    // Mostra qualquer erro do Supabase
-    if (resultKey.error || resultTeste.error) {
+    if (resultTeste.error) {
       return res.status(500).json({
         valid: false,
         message: "Erro do Supabase",
-        erroKey: resultKey.error?.message || null,
-        erroTeste: resultTeste.error?.message || null
+        detalhes: resultTeste.error.message,
+        codigo: resultTeste.error.code,
+        detalhes_extra: resultTeste.error.details,
+        dica: resultTeste.error.hint
+      });
+    }
+
+    if (resultTeste.data) {
+      return res.status(200).json({
+        valid: true,
+        message: "Key válida"
       });
     }
 
@@ -72,7 +80,7 @@ export default async function handler(req, res) {
     return res.status(500).json({
       valid: false,
       message: "Erro interno",
-      error: error.message
+      detalhes: error.message
     });
   }
 }
