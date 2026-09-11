@@ -23,9 +23,9 @@ export default async function handler(req, res) {
   }
 
   const { data, error } = await supabase
-    .from("key")
+    .from("Key")
     .select("id")
-    .eq("key", key)
+    .eq("Key", Key)
     .maybeSingle();
 
   if (error) {
