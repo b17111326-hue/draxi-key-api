@@ -13,37 +13,48 @@ export default async function handler(req, res) {
     });
   }
 
-  const { key } = req.body || {};
+  try {
+    const { key } = req.body || {};
 
-  if (!key) {
-    return res.status(400).json({
-      valid: false,
-      message: "Key não informada"
+    if (!key) {
+      return res.status(400).json({
+        valid: false,
+        message: "Key não informada"
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("Key")
+      .select("id, Key, teste")
+      .eq("Key", key)
+      .maybeSingle();
+
+    if (error) {
+      return res.status(500).json({
+        valid: false,
+        message: "Erro do Supabase",
+        error: error.message,
+        code: error.code
+      });
+    }
+
+    if (!data) {
+      return res.status(401).json({
+        valid: false,
+        message: "Key não encontrada"
+      });
+    }
+
+    return res.status(200).json({
+      valid: true,
+      message: "Key válida"
     });
-  }
 
-  const { data, error } = await supabase
-    .from("Key")
-    .select("id")
-    .eq("Key", Key)
-    .maybeSingle();
-
-  if (error) {
+  } catch (error) {
     return res.status(500).json({
       valid: false,
-      message: "Erro ao consultar a Key"
+      message: "Erro interno",
+      error: error.message
     });
   }
-
-  if (!data) {
-    return res.status(401).json({
-      valid: false,
-      message: "Key inválida"
-    });
-  }
-
-  return res.status(200).json({
-    valid: true,
-    message: "Key válida"
-  });
 }
