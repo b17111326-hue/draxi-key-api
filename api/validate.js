@@ -23,48 +23,22 @@ export default async function handler(req, res) {
       });
     }
 
-    const resultKey = await supabase
-      .from("Key")
-      .select("id")
-      .eq("Key", key)
-      .maybeSingle();
-
-    if (resultKey.error) {
-      return res.status(500).json({
-        valid: false,
-        message: "Erro do Supabase",
-        detalhes: resultKey.error.message,
-        codigo: resultKey.error.code,
-        detalhes_extra: resultKey.error.details,
-        dica: resultKey.error.hint
-      });
-    }
-
-    if (resultKey.data) {
-      return res.status(200).json({
-        valid: true,
-        message: "Key válida"
-      });
-    }
-
-    const resultTeste = await supabase
+    const { data, error } = await supabase
       .from("Key")
       .select("id")
       .eq("teste", key)
-      .maybeSingle();
+      .limit(1);
 
-    if (resultTeste.error) {
+    if (error) {
       return res.status(500).json({
         valid: false,
         message: "Erro do Supabase",
-        detalhes: resultTeste.error.message,
-        codigo: resultTeste.error.code,
-        detalhes_extra: resultTeste.error.details,
-        dica: resultTeste.error.hint
+        detalhes: error.message,
+        codigo: error.code
       });
     }
 
-    if (resultTeste.data) {
+    if (data && data.length > 0) {
       return res.status(200).json({
         valid: true,
         message: "Key válida"
