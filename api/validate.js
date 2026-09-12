@@ -32,9 +32,10 @@ export default async function handler(req, res) {
     if (error) {
       return res.status(500).json({
         valid: false,
-        message: "Erro do Supabase",
+        message: "Erro no Supabase",
         detalhes: error.message,
-        codigo: error.code
+        codigo: error.code,
+        dica: error.hint || "Sem dica"
       });
     }
 
